@@ -1,5 +1,10 @@
 from tkinter import ttk
 
+alumno_data = ['id', 'nombre', 'apellido', 'apellido2', 'fecha_nacimiento', 'email', 'id_profesores', 'id_directivos', 'id_materias']
+directivo_data = ['id', 'nombre', 'apellido', 'apellido2', 'fecha_nacimiento', 'email', 'cargo', 'fecha_inicio']
+profesor_data = ['id', 'nombre', 'apellido', 'apellido2', 'fecha_nacimiento', 'email', 'id_materia', 'id_directivo']
+materias_data = ['id', 'nombre', 'id_profesor']
+boletines_data = ['id', 'nombre_alumno', 'materia_1', 'materia_2', 'materia_3', 'materia_4', 'promedio']
 
 buttons = [
     {
