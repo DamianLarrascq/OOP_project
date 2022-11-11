@@ -62,7 +62,7 @@ class MainFrame(ttk.Frame):
 
     def create_scrollbar(self, container, tree):
         sc_bar = ttk.Scrollbar(container, orient='vertical', command=tree.yview)
-        sc_bar.grid(row=1, column=1, sticky='e')
+        sc_bar.grid(row=1, column=1, sticky='nese')
         tree['yscrollcommand'] = sc_bar.set
 
     def create_operations(self, i):
