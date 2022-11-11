@@ -1,4 +1,5 @@
 import tkinter
+import sqlite3
 from tkinter import ttk
 from utils import alumno_data, profesor_data, boletines_data, materias_data, directivo_data
 
@@ -10,10 +11,6 @@ class MainFrame(ttk.Frame):
 
         self.nb_width = 600
         self.nb_height = 380
-
-        # Notebook style
-        self.nb_style = ttk.Style()
-        self.nb_style.configure('TNotebook.Tab', font='Helvetica 14', padding=(10,0,10,0))
 
         # Notebook
         self.nb = ttk.Notebook(self)
@@ -53,7 +50,20 @@ class MainFrame(ttk.Frame):
         self.materias_tree = self.create_tree_widget(self.tab_4, materias_data)
         self.materias_tree.grid(row=1, column=0)
 
+        self.add_directivos()
+
+        self.create_scrollbar(self.tab_0, self.alumnos_tree)
+        self.create_scrollbar(self.tab_1, self.profesores_tree)
+        self.create_scrollbar(self.tab_2, self.directivos_tree)
+        self.create_scrollbar(self.tab_3, self.boletines_tree)
+        self.create_scrollbar(self.tab_4, self.materias_tree)
+
         self.grid(row=0, column=0)
+
+    def create_scrollbar(self, container, tree):
+        sc_bar = ttk.Scrollbar(container, orient='vertical', command=tree.yview)
+        sc_bar.grid(row=1, column=1, sticky='e')
+        tree['yscrollcommand'] = sc_bar.set
 
     def create_operations(self, i):
         tab_num = f'tab_{i}'
@@ -88,21 +98,21 @@ class MainFrame(ttk.Frame):
         tree = ttk.Treeview(container, columns=columns, show='headings')
 
         for value in range(len(columns)):
-            tree.column(columns[value])
-            val = columns[value].replace('_', ' ')
+            tree.column(columns[value], anchor='center')
+            val = columns[value].replace('_', ' ').title()
             tree.heading(columns[value], text=val)
 
-        # Generate sample data
-        # col_data = []
-        # for i in range(20):
-        #     col_data.append((f'nombre apellido {i}', f'10.100.10{i}',
-        #                           f'2{i}/02/190{i}', f'email_{i}@email.com'))
-        #
-        # Add data to the treeview
-        # for data in col_data:
-        #     tree.insert('', tkinter.END, values=data)
-
         return tree
+
+    def add_directivos(self):
+        con = sqlite3.connect('colegio.db')
+        cur = con.cursor()
+        cur.execute('SELECT * FROM directivos')
+        records = cur.fetchall()
+        for record in records:
+            self.directivos_tree.insert('', tkinter.END, values=record)
+        con.commit()
+        con.close()
 
 
 class App(tkinter.Tk):
@@ -115,6 +125,11 @@ class App(tkinter.Tk):
 app = App()
 
 frame = MainFrame(app)
+
+style = ttk.Style()
+style.theme_use('default')
+style.configure('Treeview', background='#D3D3D3', foreground='black',
+                     rowheight=25, fieldbackground='#D3D3D3')
 
 btn_style = ttk.Style()
 btn_style.configure('Custom.TButton', foreground='black', font='Helvetica 10')
