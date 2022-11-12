@@ -51,6 +51,7 @@ class MainFrame(ttk.Frame):
         self.materias_tree.grid(row=1, column=0)
 
         self.add_directivos()
+        self.add_alumnos()
 
         self.create_scrollbar(self.tab_0, self.alumnos_tree)
         self.create_scrollbar(self.tab_1, self.profesores_tree)
@@ -61,32 +62,29 @@ class MainFrame(ttk.Frame):
         self.grid(row=0, column=0)
 
     def create_scrollbar(self, container, tree):
-        sc_bar = ttk.Scrollbar(container, orient='vertical', command=tree.yview)
-        sc_bar.grid(row=1, column=1, sticky='nese')
-        tree['yscrollcommand'] = sc_bar.set
+        v_scroll = ttk.Scrollbar(container, orient='vertical', command=tree.yview)
+        v_scroll.grid(row=1, column=1, sticky='nese')
+        tree['yscrollcommand'] = v_scroll.set
+        # h_scroll = ttk.Scrollbar(container, orient='horizontal', command=tree.xview)
+        # h_scroll.grid(row=2, sticky='swse')
+        # tree['xscrollcommand'] = v_scroll.set
 
     def create_operations(self, i):
         tab_num = f'tab_{i}'
         tab = getattr(self, tab_num)
         frame_name = f'lb_frame_{tab_num}'
-        button_name = f'btn_frame_{tab_num}'
         setattr(self, frame_name, ttk.LabelFrame(tab, text='Operaciones'))
         frame = getattr(self, frame_name)
         getattr(self, frame_name).grid(row=0, column=0, sticky='w', padx=25)
-        setattr(self, button_name, ttk.Button(frame, text='Nuevo'))
-        getattr(self, button_name).grid(row=0, column=0, padx=5, pady=5)
-        setattr(self, button_name, ttk.Button(frame, text='Cargar'))
-        getattr(self, button_name).grid(row=0, column=1, padx=5, pady=5)
-        setattr(self, button_name, ttk.Button(frame, text='Editar'))
-        getattr(self, button_name).grid(row=0, column=2, padx=5, pady=5)
-        setattr(self, button_name, ttk.Button(frame, text='Eliminar'))
-        getattr(self, button_name).grid(row=0, column=3, padx=5, pady=5)
+        self.create_buttons(frame, ['Nuevo', 'Cargar', 'Editar', 'Eliminar'])
 
-    # def create_button(self, frame, button_name):
-    #
-    #     for i in button_name:
-    #         setattr(self, button_name[i], ttk.Button(frame, text=button_name[i]))
-    #         getattr(self, button_name[i]).grid(row=0, column=i)
+    def create_buttons(self, frame, btn_list):
+
+        col = 0
+        for button in btn_list:
+            setattr(self, button, ttk.Button(frame, text=button))
+            getattr(self, button).grid(row=0, column=col, padx=5, pady=5)
+            col += 1
 
     def create_tree_widget(self, container, col_values):
         """
@@ -95,7 +93,7 @@ class MainFrame(ttk.Frame):
         :return: Treeview widget
         """
         columns = col_values
-        tree = ttk.Treeview(container, columns=columns, show='headings')
+        tree = ttk.Treeview(container, columns=columns, show='headings', selectmode='extended')
 
         for value in range(len(columns)):
             tree.column(columns[value], anchor='center')
@@ -111,6 +109,46 @@ class MainFrame(ttk.Frame):
         records = cur.fetchall()
         for record in records:
             self.directivos_tree.insert('', tkinter.END, values=record)
+        con.commit()
+        con.close()
+
+    def add_alumnos(self):
+        con = sqlite3.connect('colegio.db')
+        cur = con.cursor()
+        cur.execute('SELECT * FROM alumnos')
+        records = cur.fetchall()
+        for record in records:
+            self.alumnos_tree.insert('', tkinter.END, values=record)
+        con.commit()
+        con.close()
+
+    def add_profesores(self):
+        con = sqlite3.connect('colegio.db')
+        cur = con.cursor()
+        cur.execute('SELECT * FROM profesores')
+        records = cur.fetchall()
+        for record in records:
+            self.profesores_tree.insert('', tkinter.END, values=record)
+        con.commit()
+        con.close()
+
+    def add_boletines(self):
+        con = sqlite3.connect('colegio.db')
+        cur = con.cursor()
+        cur.execute('SELECT * FROM boletines')
+        records = cur.fetchall()
+        for record in records:
+            self.boletines_tree.insert('', tkinter.END, values=record)
+        con.commit()
+        con.close()
+
+    def add_materias(self):
+        con = sqlite3.connect('colegio.db')
+        cur = con.cursor()
+        cur.execute('SELECT * FROM materias')
+        records = cur.fetchall()
+        for record in records:
+            self.materias_tree.insert('', tkinter.END, values=record)
         con.commit()
         con.close()
 
