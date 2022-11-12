@@ -50,15 +50,25 @@ class MainFrame(ttk.Frame):
         self.materias_tree = self.create_tree_widget(self.tab_4, materias_data)
         self.materias_tree.grid(row=1, column=0)
 
+        # Add data from db
         self.add_directivos()
         self.add_alumnos()
 
+        # Scrollbar for tabs
         self.create_scrollbar(self.tab_0, self.alumnos_tree)
         self.create_scrollbar(self.tab_1, self.profesores_tree)
         self.create_scrollbar(self.tab_2, self.directivos_tree)
         self.create_scrollbar(self.tab_3, self.boletines_tree)
         self.create_scrollbar(self.tab_4, self.materias_tree)
 
+        # Record frame for tabs
+        self.create_record_frame(self.tab_0, alumno_data)
+        self.create_record_frame(self.tab_1, profesor_data)
+        self.create_record_frame(self.tab_2, directivo_data)
+        self.create_record_frame(self.tab_3, boletines_data)
+        self.create_record_frame(self.tab_4, materias_data)
+
+        # Position of MainFrame
         self.grid(row=0, column=0)
 
     def create_scrollbar(self, container, tree):
@@ -69,6 +79,11 @@ class MainFrame(ttk.Frame):
         # h_scroll.grid(row=2, sticky='swse')
         # tree['xscrollcommand'] = v_scroll.set
 
+    def create_record_frame(self, container, list):
+        r_frame = ttk.LabelFrame(container, text='Records')
+        r_frame.grid(row=2, column=0, sticky='w', padx=25)
+        self.create_entry_labels(r_frame, list)
+
     def create_operations(self, i):
         tab_num = f'tab_{i}'
         tab = getattr(self, tab_num)
@@ -76,10 +91,24 @@ class MainFrame(ttk.Frame):
         setattr(self, frame_name, ttk.LabelFrame(tab, text='Operaciones'))
         frame = getattr(self, frame_name)
         getattr(self, frame_name).grid(row=0, column=0, sticky='w', padx=25)
-        self.create_buttons(frame, ['Nuevo', 'Cargar', 'Editar', 'Eliminar'])
+        self.create_buttons(frame, ['Nuevo', 'Cargar', 'Editar', 'Eliminar', 'Seleccionar'])
+
+    def create_entry_labels(self, frame, lb_list):
+        col = 0
+        rw = 0
+        for label in lb_list:
+            lb = label.replace('_',' ').title() + ':'
+            setattr(self, label, ttk.Label(frame, text=lb))
+            getattr(self, label).grid(row=rw, column=col, padx=5, pady=5, sticky='w')
+            entry = label + '_entry'
+            if col > 3:
+                rw += 2
+                col = 0
+            setattr(self, entry, ttk.Entry(frame))
+            getattr(self, entry).grid(row=(rw+1), column=col, padx=5, pady=5)
+            col += 1
 
     def create_buttons(self, frame, btn_list):
-
         col = 0
         for button in btn_list:
             setattr(self, button, ttk.Button(frame, text=button))
@@ -94,9 +123,8 @@ class MainFrame(ttk.Frame):
         """
         columns = col_values
         tree = ttk.Treeview(container, columns=columns, show='headings', selectmode='extended')
-
         for value in range(len(columns)):
-            tree.column(columns[value], anchor='center')
+            tree.column(columns[value], anchor='center', width=130)
             val = columns[value].replace('_', ' ').title()
             tree.heading(columns[value], text=val)
 
@@ -156,7 +184,7 @@ class MainFrame(ttk.Frame):
 class App(tkinter.Tk):
     def __init__(self):
         super().__init__()
-        self.geometry('600x400')
+        self.geometry('1200x600')
         self.title('School Management System')
 
 
@@ -165,9 +193,11 @@ app = App()
 frame = MainFrame(app)
 
 style = ttk.Style()
-style.theme_use('default')
-style.configure('Treeview', background='#D3D3D3', foreground='black',
-                     rowheight=25, fieldbackground='#D3D3D3')
+style.theme_use('winnative')
+style.configure('Treeview', background='lightgray', foreground='black',
+                     rowheight=25, fieldbackground='lightgray')
+
+style.configure('TNotebook.Tab', padding=(10,0,10,0), font='Helvetica 12')
 
 btn_style = ttk.Style()
 btn_style.configure('Custom.TButton', foreground='black', font='Helvetica 10')
