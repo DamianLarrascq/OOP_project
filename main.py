@@ -101,12 +101,12 @@ class MainFrame(ttk.Frame):
             setattr(self, label, ttk.Label(frame, text=lb))
             getattr(self, label).grid(row=rw, column=col, padx=5, pady=5, sticky='w')
             entry = label + '_entry'
-            if col > 3:
-                rw += 2
-                col = 0
             setattr(self, entry, ttk.Entry(frame))
             getattr(self, entry).grid(row=(rw+1), column=col, padx=5, pady=5)
             col += 1
+            if col == 4:
+                rw += 2
+                col = 0
 
     def create_buttons(self, frame, btn_list):
         col = 0
