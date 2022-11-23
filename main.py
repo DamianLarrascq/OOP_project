@@ -50,9 +50,8 @@ class MainFrame(ttk.Frame):
         self.materias_tree = self.create_tree_widget(self.tab_4, materias_data)
         self.materias_tree.grid(row=1, column=0)
 
-        # Add data from db
-        self.add_directivos()
-        self.add_alumnos()
+        # Load data from db
+        self.load_data()
 
         # Scrollbar for tabs
         self.create_scrollbar(self.tab_0, self.alumnos_tree)
@@ -62,11 +61,11 @@ class MainFrame(ttk.Frame):
         self.create_scrollbar(self.tab_4, self.materias_tree)
 
         # Record frame for tabs
-        self.create_record_frame(self.tab_0, alumno_data)
-        self.create_record_frame(self.tab_1, profesor_data)
-        self.create_record_frame(self.tab_2, directivo_data)
-        self.create_record_frame(self.tab_3, boletines_data)
-        self.create_record_frame(self.tab_4, materias_data)
+        self.create_entry_labels(self.create_record_frame(self.tab_0), alumno_data)
+        self.create_entry_labels(self.create_record_frame(self.tab_1),profesor_data)
+        self.create_entry_labels(self.create_record_frame(self.tab_2), directivo_data)
+        self.create_entry_labels(self.create_record_frame(self.tab_3), boletines_data)
+        self.create_entry_labels(self.create_record_frame(self.tab_4), materias_data)
 
         # Position of MainFrame
         self.grid(row=0, column=0)
@@ -79,10 +78,10 @@ class MainFrame(ttk.Frame):
         # h_scroll.grid(row=2, sticky='swse')
         # tree['xscrollcommand'] = v_scroll.set
 
-    def create_record_frame(self, container, list):
+    def create_record_frame(self, container):
         r_frame = ttk.LabelFrame(container, text='Records')
         r_frame.grid(row=2, column=0, sticky='w', padx=25)
-        self.create_entry_labels(r_frame, list)
+        return r_frame
 
     def create_operations(self, i):
         tab_num = f'tab_{i}'
@@ -96,17 +95,20 @@ class MainFrame(ttk.Frame):
     def create_entry_labels(self, frame, lb_list):
         col = 0
         rw = 0
+        entry_list = []
         for label in lb_list:
             lb = label.replace('_',' ').title() + ':'
             setattr(self, label, ttk.Label(frame, text=lb))
-            getattr(self, label).grid(row=rw, column=col, padx=5, pady=5, sticky='w')
+            getattr(self, label).grid(row=rw, column=col, padx=5, pady=5)
             entry = label + '_entry'
-            setattr(self, entry, ttk.Entry(frame))
+            setattr(self, entry, ttk.Entry(frame, state='disabled'))
             getattr(self, entry).grid(row=(rw+1), column=col, padx=5, pady=5)
             col += 1
             if col == 4:
                 rw += 2
                 col = 0
+            entry_list.append(entry)
+        return entry_list
 
     def create_buttons(self, frame, btn_list):
         col = 0
@@ -130,53 +132,39 @@ class MainFrame(ttk.Frame):
 
         return tree
 
-    def add_directivos(self):
+    def load_data(self):
         con = sqlite3.connect('colegio.db')
         cur = con.cursor()
-        cur.execute('SELECT * FROM directivos')
-        records = cur.fetchall()
-        for record in records:
-            self.directivos_tree.insert('', tkinter.END, values=record)
-        con.commit()
-        con.close()
-
-    def add_alumnos(self):
-        con = sqlite3.connect('colegio.db')
-        cur = con.cursor()
-        cur.execute('SELECT * FROM alumnos')
-        records = cur.fetchall()
-        for record in records:
+        query_al = "SELECT * FROM alumnos"
+        query_dir = "SELECT * FROM directivos"
+        query_prof = "SELECT * FROM profesores"
+        query_bol = "SELECT * FROM boletines"
+        query_mat = "SELECT * FROM materias"
+        cur.execute(query_al)
+        records_al = cur.fetchall()
+        for record in records_al:
             self.alumnos_tree.insert('', tkinter.END, values=record)
-        con.commit()
-        con.close()
 
-    def add_profesores(self):
-        con = sqlite3.connect('colegio.db')
-        cur = con.cursor()
-        cur.execute('SELECT * FROM profesores')
-        records = cur.fetchall()
-        for record in records:
-            self.profesores_tree.insert('', tkinter.END, values=record)
-        con.commit()
-        con.close()
+        cur.execute(query_dir)
+        records_dir = cur.fetchall()
+        for record in records_dir:
+            self.directivos_tree.insert('', tkinter.END, values=record)
 
-    def add_boletines(self):
-        con = sqlite3.connect('colegio.db')
-        cur = con.cursor()
-        cur.execute('SELECT * FROM boletines')
-        records = cur.fetchall()
-        for record in records:
+        cur.execute(query_prof)
+        records_prof = cur.fetchall()
+        for record in records_prof:
+            self.directivos_tree.insert('', tkinter.END, values=record)
+
+        cur.execute(query_bol)
+        records_bol = cur.fetchall()
+        for record in records_bol:
             self.boletines_tree.insert('', tkinter.END, values=record)
-        con.commit()
-        con.close()
 
-    def add_materias(self):
-        con = sqlite3.connect('colegio.db')
-        cur = con.cursor()
-        cur.execute('SELECT * FROM materias')
-        records = cur.fetchall()
-        for record in records:
+        cur.execute(query_mat)
+        records_mat = cur.fetchall()
+        for record in records_mat:
             self.materias_tree.insert('', tkinter.END, values=record)
+
         con.commit()
         con.close()
 
@@ -195,7 +183,7 @@ frame = MainFrame(app)
 style = ttk.Style()
 style.theme_use('winnative')
 style.configure('Treeview', background='lightgray', foreground='black',
-                     rowheight=25, fieldbackground='lightgray')
+                rowheight=25, fieldbackground='lightgray')
 
 style.configure('TNotebook.Tab', padding=(10,0,10,0), font='Helvetica 12')
 
