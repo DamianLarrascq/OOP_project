@@ -1,11 +1,11 @@
 import tkinter
 import sqlite3
 from tkinter import ttk
-from utils import alumno_data, profesor_data, boletines_data, materias_data, directivo_data
 
 
-class EditForm:
+class EditForm(ttk.Frame):
     def __init__(self, frame, record_data):
+        super().__init__(self, frame)
         frame = ttk.LabelFrame(frame, text='Records')
         frame.grid(row=2, column=0, sticky='w', padx=25)
         col = 0
@@ -46,8 +46,9 @@ class EditForm:
         return result
 
 
-class CreateForm:
+class CreateForm(ttk.Frame):
     def __init__(self, frame, record_data):
+        super().__init__(self, frame)
         frame = ttk.LabelFrame(frame, text='Records')
         frame.grid(row=2, column=0, sticky='w', padx=25)
         col = 0
@@ -133,7 +134,6 @@ class CRUDView:
         """
         :param record_data:
         :param container: Surface where widget will load
-        :param col_values: Tuple or list of strings w/o spaces for columns
         :return: Treeview widget
         """
         if record_data:
@@ -164,8 +164,7 @@ class RecordController:
 
     def get_record(self, table_name: str, identifier: int) -> dict:
         """
-        Retrieves a single instance of a record.
-
+        Retrieves a single instance of a record
         :param table_name:
         :param identifier:
         :return:
@@ -240,6 +239,23 @@ class App(tkinter.Tk):
         super().__init__()
         self.geometry('1200x600')
         self.title('School Management System')
+
+        container = ttk.Frame(self)
+        container.grid(row=0, column=0)
+
+        self.frames = {}
+
+        for F in (MainFrame, EditForm, CreateForm):
+            page_name = F.__name__
+            frame = F(container, self)
+            self.frames[page_name] = frame
+            frame.grid(row=1, column=0, sticky='w')
+
+        self.show_frame(MainFrame)
+
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
 
 
 app = App()
