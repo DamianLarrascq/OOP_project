@@ -16,16 +16,16 @@ class EditForm(ttk.Frame):
             setattr(self, col_name, ttk.Label(frame, text=lb))
             getattr(self, col_name).grid(row=rw, column=col, padx=5, pady=5)
 
-            # entry
-            entry = col_name + '_entry'
-            setattr(self, entry, ttk.Entry(frame))
-            _entry = getattr(self, entry)
-            _entry.grid(row=(rw + 1), column=col, padx=5, pady=5)
-            _entry.insert(0, value)
-            col += 1
-            if col == 4:
-                rw += 2
-                col = 0
+                # entry
+                entry = col_name + '_entry'
+                setattr(self, entry, ttk.Entry(frame))
+                _entry = getattr(self, entry)
+                _entry.grid(row=(rw + 1), column=col, padx=5, pady=5)
+                _entry.insert(0, value)
+                col += 1
+                if col == 4:
+                    rw += 2
+                    col = 0
 
     @staticmethod
     def open_edit_form(event):
@@ -42,7 +42,7 @@ class EditForm(ttk.Frame):
         _frame.grid(row=1, column=0)
 
         result = RecordController().get_record(table_name, id)
-        edit_form = EditForm(_frame, result)
+        # edit_form = EditForm(_frame, result)
         return result
 
 
@@ -230,6 +230,8 @@ class MainFrame(ttk.Frame):
             items_data = controller.get_record_list(item)
             crud_view = CRUDView(self.nb, _tab, item, items_data)
 
+            crud_frame = CRUDFrame(container, item)
+
         # Position of MainFrame
         self.grid(row=0, column=0)
 
@@ -260,18 +262,25 @@ class App(tkinter.Tk):
 
 app = App()
 
-resource_list = ['Alumnos', 'Directivos']
+        self.edit_form = EditForm(self, [])
 
-MainFrame(app, resource_list)
 
-style = ttk.Style()
-# style.theme_use('winnative')
-style.configure('Treeview', background='lightgray', foreground='black',
-                rowheight=25, fieldbackground='lightgray')
 
-style.configure('TNotebook.Tab', padding=(10, 0, 10, 0), font='Helvetica 12')
+if __name__ == "__main__":
+    app = App()
 
-btn_style = ttk.Style()
-btn_style.configure('Custom.TButton', foreground='black', font='Helvetica 10')
+    resource_list = ['Alumnos', 'Directivos']
 
-app.mainloop()
+    main_frame = MainFrame(app, resource_list)
+
+    style = ttk.Style()
+    # style.theme_use('winnative')
+    style.configure('Treeview', background='lightgray', foreground='black',
+                    rowheight=25, fieldbackground='lightgray')
+
+    style.configure('TNotebook.Tab', padding=(10, 0, 10, 0), font='Helvetica 12')
+
+    btn_style = ttk.Style()
+    btn_style.configure('Custom.TButton', foreground='black', font='Helvetica 10')
+
+    app.mainloop()
