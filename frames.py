@@ -1,17 +1,21 @@
-import tkinter
-from tkinter import ttk
+import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.tableview import Tableview
 
 
 class MainFrame(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
-        self.grid(row=0, column=0)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure((0, 1), weight=1)
+        self.pack()
 
 
 class CRUDViewFrame(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
-        self.grid(row=0, column=0)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure((0, 1), weight=1)
         self.controller = controller
 
 
@@ -22,34 +26,39 @@ class ListViewFrame(ttk.Frame):
         # self.grid(row=0, column=0)
         self.nb_width = 600
         self.nb_height = 380
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure((0,1), weight=1)
 
         # Notebook
         self.nb = ttk.Notebook(self)
         self.nb.grid(row=1, column=0)
 
+        # for i in range(len(data)):
+
+
         # Notebook tabs
-        self.tab_0 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
-        self.tab_1 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
-        self.tab_2 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
-        self.tab_3 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
-        self.tab_4 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
+        # self.tab_0 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
+        # self.tab_1 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
+        # self.tab_2 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
+        # self.tab_3 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
+        # self.tab_4 = ttk.Frame(self.nb, width=self.nb_width, height=self.nb_height)
 
         # Add tabs to notebook
         # self.nb.add(self.tab_0, text='Alumnos')
-        self.nb.add(self.tab_1, text='Profesores')
-        self.nb.add(self.tab_2, text='Directivos')
-        self.nb.add(self.tab_3, text='Boletines')
-        self.nb.add(self.tab_4, text='Materias')
+        # self.nb.add(self.tab_1, text='Profesores')
+        # self.nb.add(self.tab_2, text='Directivos')
+        # self.nb.add(self.tab_3, text='Boletines')
+        # self.nb.add(self.tab_4, text='Materias')
 
         # db_controller = RecordController()
-        for item in data:
-            _data = item['initial_data']
-            self.create_crud_view(self.tab_0, item['object'], _data)
+        # for item in data:
+        #     _data = item['initial_data']
+        #     self.create_crud_view(self.tab_0, item['object'], _data)
         # alumnos_data = data
         # self.create_crud_view(self.tab_0, 'Alumnos', alumnos_data)
 
         # Position of MainFrame
-        self.grid(row=0, column=0)
+        self.grid(row=0, column=0, sticky='nsew')
 
     def create_crud_view(self, frame, resource_name: str, data: list[dict]):
         # self.selected_row = {}
@@ -114,7 +123,7 @@ class ListViewFrame(ttk.Frame):
 
             # insert record
             for record in record_data:
-                tree.insert('', tkinter.END, values=list(record.values()))
+                tree.insert('', tk.END, values=list(record.values()))
         else:
             return ttk.Treeview(container, columns=[], show='headings', selectmode='extended')
         return tree
